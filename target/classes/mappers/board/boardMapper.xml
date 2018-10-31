@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ljs.board.mappers.board.BoardMapper">
+
+<insert id="insertBoard">
+		<![CDATA[
+			INSERT INTO TB_BOARD
+			(
+			    TITLE, 
+			    CONTENTS, 
+			    HIT_CNT, 
+			    CREA_DTM,
+			    CREA_ID
+			)
+			VALUES
+			(
+			    #{title}, 
+			    #{contents}, 
+			    0, 
+			    SYSDATE(),
+			    #{crea_id}
+			)
+		]]>
+</insert>
+<select id="selectBoardDetail" parameterType="int" resultMap="BoardResultMap">
+<![CDATA[
+			SELECT
+				IDX,
+				HIT_CNT,
+				CREA_ID,
+				CREA_DTM,
+				TITLE,
+				CONTENTS
+			FROM
+				TB_BOARD
+			WHERE
+				IDX = #{IDX}		
+		]]>
+</select>
+<update id="updateBoard">
+		<![CDATA[
+			UPDATE TB_BOARD 
+			SET
+				TITLE = #{title},
+				CONTENTS = #{contents}
+			WHERE
+				IDX = #{idx}	
+		]]>
+</update>
+
+<update id="deleteBoard">
+		<![CDATA[
+			DELETE FROM TB_BOARD WHERE IDX = #{idx}
+		]]>
+</update>
+
+<select id="selectBoardList" parameterType="hashmap" resultType="hashmap">
+select * FROM tb_board
+<where>
+ <if test="searchWord !=null">
+TITLE LIKE '%${searchWord}%'
+</if>
+
+</where>
+ORDER BY IDX DESC limit #{start},#{end};
+</select>
+
+<select id="BoardCnt" resultType="int" parameterType="hashmap">
+        SELECT  COUNT(*) AS CNT
+          FROM  TB_BOARD
+          <where>
+<if test="searchWord !=null">
+TITLE LIKE '%${searchWord}%'
+</if>
+</where>
+</select>
+<update id="updateHitCnt" parameterType="hashmap">
+	<![CDATA[
+		UPDATE TB_BOARD 
+		SET
+			HIT_CNT = HIT_CNT + 1
+		WHERE
+			IDX = #{IDX}	
+	]]>
+</update>
+<resultMap id="BoardResultMap" type="BoardVO">
+<result property="idx" column="IDX"/>
+<result property="title" column="TITLE"/>
+<result property="contents" column="CONTENTS"/>
+<result property="hit_cnt" column="HIT_CNT"/>
+<result property="crea_dtm" column="CREA_DTM"/>
+<result property="crea_id" column="CREA_ID"/>
+</resultMap>
+</mapper>
